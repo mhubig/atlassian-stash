@@ -1,0 +1,18 @@
+stash:
+  build: docker/stash
+  ports:
+    - "7990:7990" # no cache
+    - "7999:7999" # ssh port
+  links:
+    - database
+  volumes:
+    - home:/opt/stash-home
+  restart: always
+
+database:
+  hostname: database
+  build: docker/postgres
+  volumes:
+    - tmp:/tmp # import backups
+    - data:/var/lib/postgresql/data
+  restart: always

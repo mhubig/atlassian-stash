@@ -54,7 +54,7 @@ def bup_index():
 
 def do_psql_dump():
     print 'dumping...'
-    dumped = local('docker run -it --rm --link stash_database_1:db '
+    dumped = local('docker run -t --rm --link stash_database_1:db '
                    '-v $(pwd):/tmp postgres sh -c \'pg_dump -U stash -h '
                    '"$DB_PORT_5432_TCP_ADDR" -w stash > /tmp/stash.dump\'')
 

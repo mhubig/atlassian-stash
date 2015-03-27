@@ -2,6 +2,8 @@
 
 import os
 import sys
+import boto.ec2
+import json
 from fabric.api import local, task
 from fabric.context_managers import shell_env
 
@@ -13,12 +15,35 @@ def backup():
     bup_init()
     bup_index()
     do_bup_backup()
+    do_snapshot()
     start_docker_container()
 
 
 @task
 def restore():
     do_bup_restore()
+
+
+def do_snapshot():
+    with open('.aws-auth') as f:
+        auth = json.load(f)
+    os.environ['AWS_ACCESS_KEY_ID'] = auth['key_id']
+    os.environ['AWS_SECRET_ACCESS_KEY'] = auth['secret_key']
+    instance_id = local(
+        'curl http://169.254.169.254/latest/meta-data/instance-id',
+        capture=True)
+    conn = boto.ec2.connect_to_region('eu-central-1')
+    volumes = conn.get_all_volumes(
+        filters={'attachment.instance-id': instance_id})
+
+    backup_vol = None
+    for vol in volumes:
+        if 'Name' in vol.tags and vol.tags['Name'] == 'stash-data-volume':
+            backup_vol = vol
+            break
+
+    if backup_vol:
+        conn.create_snapshot(backup_vol.id, description='stash-data-snap')
 
 
 def do_bup_backup():

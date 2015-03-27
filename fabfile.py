@@ -38,7 +38,7 @@ def do_snapshot():
 
     backup_vol = None
     for vol in volumes:
-        if 'Name' in vol.tags and vol.tags['Name'] == 'stash-data-volume':
+        if vol.attach_data.device == '/dev/xvdh': 
             backup_vol = vol
             break
 

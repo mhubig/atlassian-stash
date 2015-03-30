@@ -57,6 +57,7 @@ will pick them up automagically on the first run if there is no `data` folder
 ### Restore the PostgreSQL data
 
 To restore the postresql data you have two options:
+
     1. Remove the `data` folder and put the dumpfile into `tmp`
     2. Replace the `data` folder with a bup backuped `data` folder
 

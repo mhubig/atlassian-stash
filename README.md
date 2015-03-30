@@ -66,8 +66,8 @@ To restore the postresql data you have two options:
     # All commands have to be launched from within the root folder of the app.
     $ /srv/data/stash
 
-    Once you have run the restore command, you have to remove `data/ tmp/ dumps/ home/`
-    Move the folders from the created stashbackup folder into the app root (where the deleted folders used to be).
+Once you have run the restore command, you have to remove `data/ tmp/ dumps/ home/`
+Move the folders from the created stashbackup folder into the app root (where the deleted folders used to be).
 
 ### Show all possible restore points:
 

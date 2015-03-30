@@ -84,10 +84,8 @@ def do_psql_dump():
         sys.exit(1)
 
     if not os.path.exists(os.path.join(os.getcwd(), 'dumps')):
-        print 'dumps folder not existing yet. Creating...'
         local('mkdir dumps')
     local('mv stash.dump dumps/stash.dump')
-    print 'dumped...'
 
 
 def stop_docker_container():

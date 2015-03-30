@@ -20,8 +20,8 @@ def backup():
 
 
 @task
-def restore():
-    do_bup_restore()
+def restore(destination='stashbackup', revision='latest'):
+    do_bup_restore(destination, revision)
 
 
 def do_snapshot():
@@ -38,7 +38,7 @@ def do_snapshot():
 
     backup_vol = None
     for vol in volumes:
-        if vol.attach_data.device == '/dev/xvdh': 
+        if vol.attach_data.device == '/dev/xvdh':
             backup_vol = vol
             break
 
@@ -54,18 +54,16 @@ def do_bup_backup():
         sys.exit(1)
 
 
-def do_bup_restore():
-    restored = local('BUP_DIR=$(pwd)/backup bup restore -C stashbackup '
-                     'stashbackup/latest/$(pwd)')
+def do_bup_restore(destination, revision):
+    restored = local('BUP_DIR=$(pwd)/backup bup restore -C {0} '
+                     'stashbackup/{1}/$(pwd)'.format(destination, revision))
     if restored.return_code != 0:
-        print 'An error occurred while restoring. Aborting...'
         sys.exit(1)
 
 
 def bup_init():
     initiated = local('BUP_DIR=$(pwd)/backup bup init')
     if initiated.return_code != 0:
-        print 'An error occurred while initiating bup. Aborting...'
         sys.exit(1)
 
 
@@ -73,7 +71,6 @@ def bup_index():
     indexed = local('BUP_DIR=$(pwd)/backup bup index --exclude-from '
                     '.bup.ignore $(pwd)')
     if indexed.return_code != 0:
-        print 'An error occurred while indexing bup. Aborting...'
         sys.exit(1)
 
 
@@ -84,7 +81,6 @@ def do_psql_dump():
                    '"$DB_PORT_5432_TCP_ADDR" -w stash > /tmp/stash.dump\'')
 
     if dumped.return_code != 0:
-        print 'An error occured while dumping database. Aborting...'
         sys.exit(1)
 
     if not os.path.exists(os.path.join(os.getcwd(), 'dumps')):
@@ -95,18 +91,12 @@ def do_psql_dump():
 
 
 def stop_docker_container():
-    print 'stoping...'
     stopped = local('sudo docker-compose stop stash')
     if stopped.return_code != 0:
-        print 'An error occurred while stoping container stash. Aborting...'
         sys.exit(1)
-    print 'stopped...'
 
 
 def start_docker_container():
-    print 'starting...'
     started = local('sudo docker-compose start stash')
     if started.return_code != 0:
-        print 'An error occurred while starting container stash. Aborting...'
         sys.exit(1)
-    print 'started...'

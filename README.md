@@ -60,3 +60,41 @@ will pick them up automagically on the first run.
     $ docker run -it --rm --link atlassian_database_1:db -v $(pwd):/tmp \
         postgres sh -c 'pg_restore -U stash -h "$DB_PORT_5432_TCP_ADDR" \
         -n public -w -d stash /tmp/stash.dump'
+
+## Restoring with the fabfile or bup
+
+All commands have to be launched from within the root folder of the app.
+
+`/srv/data/stash`
+
+### Show all possible restore points:
+
+`sudo BUP_DIR=$(pwd)/backup bup ls stashbackup`
+
+### Restore latest backup:
+
+With the fabfile:
+`sudo fab restore`
+
+Without the fabfile:
+`sudo BUP_DIR=$(pwd)/backup bup restore`
+
+### Restore a specific backup:
+
+With the fabfile:
+`sudo fab restore:revision='2015-03-26-123711'`
+
+Without the fabfile:
+`sudo BUP_DIR=$(pwd)/backup bup restore stashbackup/2015-03-26-123711/$(pwd)`
+
+### Restore to a different folder than stashbackup
+
+By default bup will restore the backup to a folder called stashbackup.
+To restore to another folder you can use the -C flag or pass 'destination'
+to the fabfile.
+
+With the fabfile:
+sudo fab restore:destination='anotherlocation'
+
+Without the fabfile:
+sudo BUP_DIR=$(pwd)/backup bup restore -C anotherlocation stashbackup/latest/$(pwd)
